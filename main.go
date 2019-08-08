@@ -16,6 +16,13 @@ const (
 	FOUR_AWARD
 )
 
+var WinAmountMap = map[int]int64{
+	HEAD_AWARD: 1820000000,
+	SECOND_AWARD: 1820000000/2,
+	THREE_AWARD: 150000,
+	FOUR_AWARD: 20000,
+}
+
 var lotteryCount int64
 
 var winRecords []*WinRecord
@@ -75,6 +82,7 @@ func getOneLottery(winS1 map[int]bool, winS2 int) {
 		}
 	}
 
+	//肆獎以上
 	award := NONE_AWARD
 	if mapCount >= 5 {
 		if mapCount == 6 && myS2Num == winS2 {
@@ -94,7 +102,10 @@ func getOneLottery(winS1 map[int]bool, winS2 int) {
 		}
 		winRecords = append(winRecords, record)
 
-		logMsg := fmt.Sprint("(Win!) lottery - award: ", award ,", index: ", record.Index, ", myS1Nums: ", record.S1Nums, ", myS2Num: ", record.S2Num)
+		bet := int64(100 * lotteryCount)
+		winAmount := WinAmountMap[award]
+		winLose := winAmount - bet
+		logMsg := fmt.Sprint("(Win!) lottery - award: ", award,", index: ", record.Index, ", bet: ", bet, ", win: ", winAmount, ", winLose: ", winLose, ", myS1Nums: ", record.S1Nums, ", myS2Num: ", record.S2Num)
 		fmt.Println(logMsg)
 		lotteryLog.Println(logMsg)
 	}
