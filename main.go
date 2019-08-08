@@ -24,7 +24,7 @@ var lotteryLog *log.Logger
 
 var addNewLogFileTime time.Time
 var logFileIndex int64
-const UPDATE_LOG_TIME = time.Duration(3 * time.Second)
+const UpdateLogTime = time.Duration(60 * time.Minute)
 
 type WinRecord struct {
 	Index  int64
@@ -48,7 +48,7 @@ func createLogFile() {
 		log.Fatalln("open file error !")
 	}
 	lotteryLog = log.New(logFile,"[log]",log.Ltime)
-	addNewLogFileTime = time.Now().Add(UPDATE_LOG_TIME)
+	addNewLogFileTime = time.Now().Add(UpdateLogTime)
 }
 
 func getOneLottery(winS1 map[int]bool, winS2 int) {
