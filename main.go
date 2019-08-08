@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"time"
 )
 
@@ -18,6 +20,8 @@ var lotteryCount int64
 
 var winRecords []*WinRecord
 
+var lotteryLog *log.Logger
+
 type WinRecord struct {
 	Index  int64
 	S1Nums []int
@@ -25,6 +29,14 @@ type WinRecord struct {
 }
 
 func main() {
+	fileName := "lottery.log"
+	logFile, err := os.Create(fileName)
+	defer logFile.Close()
+	if err != nil {
+		log.Fatalln("open file error !")
+	}
+	lotteryLog = log.New(logFile,"[log]",log.Ltime)
+
 	winS1 := map[int]bool{7: true, 8: true, 15: true, 19: true, 34: true, 38: true}
 	winS2 := 8
 	getOneLottery(winS1, winS2)
@@ -70,11 +82,15 @@ func getOneLottery(winS1 map[int]bool, winS2 int) {
 		}
 		winRecords = append(winRecords, record)
 
-		fmt.Println("(Win!) lottery - award: ", award ,", index: ", record.Index, ", myS1Nums: ", record.S1Nums, ", myS2Num: ", record.S2Num)
+		logMsg := fmt.Sprint("(Win!) lottery - award: ", award ,", index: ", record.Index, ", myS1Nums: ", record.S1Nums, ", myS2Num: ", record.S2Num)
+		fmt.Println(logMsg)
+		lotteryLog.Println(logMsg)
 	}
 
 	if award != HEAD_AWARD {
-		fmt.Println("lottery - index: ", lotteryCount, ", myS1Nums: ", myS1Nums, ", myS2Num: ", myS2Num)
+		logMsg := fmt.Sprint("lottery - index: ", lotteryCount, ", myS1Nums: ", myS1Nums, ", myS2Num: ", myS2Num)
+		fmt.Println(logMsg)
+		lotteryLog.Println(logMsg)
 		time.Sleep(50 * time.Millisecond)
 		getOneLottery(winS1, winS2)
 	}
