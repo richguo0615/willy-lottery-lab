@@ -22,6 +22,10 @@ var winRecords []*WinRecord
 
 var lotteryLog *log.Logger
 
+var addNewLogFileTime time.Time
+var logFileIndex int64
+const UPDATE_LOG_TIME = time.Duration(3 * time.Second)
+
 type WinRecord struct {
 	Index  int64
 	S1Nums []int
@@ -29,21 +33,29 @@ type WinRecord struct {
 }
 
 func main() {
-	fileName := "lottery.log"
-	logFile, err := os.Create(fileName)
-	defer logFile.Close()
-	if err != nil {
-		log.Fatalln("open file error !")
-	}
-	lotteryLog = log.New(logFile,"[log]",log.Ltime)
-
+	createLogFile()
 	winS1 := map[int]bool{7: true, 8: true, 15: true, 19: true, 34: true, 38: true}
 	winS2 := 8
 	getOneLottery(winS1, winS2)
 	fmt.Print("Done!")
 }
 
+func createLogFile() {
+	logFileIndex++
+	fileName := fmt.Sprintf("log/lottery%d.log", logFileIndex)
+	logFile, err := os.Create(fileName)
+	if err != nil {
+		log.Fatalln("open file error !")
+	}
+	lotteryLog = log.New(logFile,"[log]",log.Ltime)
+	addNewLogFileTime = time.Now().Add(UPDATE_LOG_TIME)
+}
+
 func getOneLottery(winS1 map[int]bool, winS2 int) {
+
+	if time.Now().UnixNano() > addNewLogFileTime.UnixNano() {
+		createLogFile()
+	}
 
 	lotteryCount++
 
